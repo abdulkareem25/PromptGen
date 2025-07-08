@@ -22,6 +22,12 @@ const authRoutes = require('./routes/auth');
 const templateRoutes = require('./routes/templates');
 const aiRoutes = require('./routes/ai');
 
+// Import middleware
+const trackPromptAnalytics = require('./middleware/analytics');
+
+// Use analytics middleware for AI routes
+app.use('/api/ai', trackPromptAnalytics);
+
 
 // Use routes
 app.use('/api/auth', authRoutes);

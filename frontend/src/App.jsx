@@ -1,41 +1,32 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import Layout from './components/Layout';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import PromptBuilder from './pages/PromptBuilder';
+import Templates from './pages/Templates';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Templates from './pages/Templates';
-import PromptBuilder from './pages/PromptBuilder';
-
-const App = () => {
+function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/templates" element={
-          <ProtectedRoute>
-            <Templates />
-          </ProtectedRoute>
-        } />
-        <Route path="/prompt-builder" element={
-          <ProtectedRoute>
-            <PromptBuilder />
-          </ProtectedRoute>
-        } />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/templates" element={<Templates />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/prompt-builder" element={<PromptBuilder />} />
+          </Route>
+        </Routes>
+      </Layout>
     </Router>
   );
-};
+}
 
 export default App;
