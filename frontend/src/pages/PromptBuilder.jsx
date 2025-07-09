@@ -61,16 +61,6 @@ const PromptBuilder = () => {
     }
   };
 
-  useEffect(() => {
-    if (inputText.length > 20) {
-      const debounceTimer = setTimeout(() => {
-        handleSuggest();
-      }, 800);
-      
-      return () => clearTimeout(debounceTimer);
-    }
-  }, [inputText, selectedPersona]);
-
   return (
     <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
