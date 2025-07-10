@@ -5,11 +5,10 @@ import { FiArrowRight, FiCopy, FiSave, FiStar } from 'react-icons/fi';
 const PersonaOption = ({ id, name, icon, active, onClick }) => (
   <button
     onClick={() => onClick(id)}
-    className={`flex flex-col items-center p-4 rounded-lg border ${
-      active 
-        ? 'border-indigo-500 bg-indigo-50' 
+    className={`flex flex-col items-center p-4 rounded-lg border ${active
+        ? 'border-indigo-500 bg-indigo-50'
         : 'border-gray-200 hover:border-gray-300'
-    }`}
+      }`}
   >
     <span className="text-2xl mb-2">{icon}</span>
     <span className="text-sm font-medium">{name}</span>
@@ -20,30 +19,46 @@ const PromptBuilder = () => {
   const [inputText, setInputText] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState('creativeWriter');
+  const [selectedPersona, setSelectedPersona] = useState('aiEnthusiast');
   const [qualityScore, setQualityScore] = useState(null);
   const [latency, setLatency] = useState(null);
+  const [error, setError] = useState(null);
 
   const personas = [
+    { id: 'aiEnthusiast', name: 'AI Expert', icon: '🤖' },
     { id: 'creativeWriter', name: 'Creative Writer', icon: '✍️' },
     { id: 'researchStudent', name: 'Researcher', icon: '📚' },
     { id: 'marketer', name: 'Marketer', icon: '📢' },
-    { id: 'aiEnthusiast', name: 'AI Expert', icon: '🤖' },
   ];
 
   const handleSuggest = async () => {
     if (!inputText.trim()) return;
-    
+
+    setError(null);
     setIsLoading(true);
+
     try {
       const { data } = await axios.post('/api/ai/suggest', {
         prompt: inputText,
         persona: selectedPersona,
-        maxNewTokens: 100
+        maxNewTokens: 512
       });
-      setSuggestions(data.suggestions || []);
-      setLatency(data.latency);
+
+      // Handle backend errors
+      if (data.error) {
+        setError(data.error);
+        setSuggestions([]);
+      } else {
+        // Flatten the suggestions array
+        const flatSuggestions = Array.isArray(data.suggestions)
+          ? data.suggestions.flat()
+          : [];
+
+        setSuggestions(flatSuggestions);
+        setLatency(data.latency);
+      }
     } catch (err) {
+      setError('Failed to connect to AI service');
       console.error('Suggestion error', err);
       setSuggestions([]);
     }
@@ -52,7 +67,7 @@ const PromptBuilder = () => {
 
   const handleScorePrompt = async () => {
     if (!inputText.trim()) return;
-    
+
     try {
       const { data } = await axios.post('/api/ai/score', { prompt: inputText });
       setQualityScore(data.score);
@@ -111,7 +126,7 @@ const PromptBuilder = () => {
               <FiArrowRight className="mr-2" />
               {isLoading ? 'Generating...' : 'Get Suggestions'}
             </button>
-            
+
             <button
               onClick={handleScorePrompt}
               className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -129,18 +144,17 @@ const PromptBuilder = () => {
                 <span className="text-sm font-medium text-gray-700">{qualityScore}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
-                  className={`h-2.5 rounded-full ${
-                    qualityScore >= 80 ? 'bg-green-500' : 
-                    qualityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`} 
+                <div
+                  className={`h-2.5 rounded-full ${qualityScore >= 80 ? 'bg-green-500' :
+                      qualityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}
                   style={{ width: `${qualityScore}%` }}
                 ></div>
               </div>
               <p className="mt-2 text-sm text-gray-600">
-                {qualityScore >= 80 ? 'Excellent! This prompt will likely produce great results.' : 
-                 qualityScore >= 60 ? 'Good. Try adding more context for better results.' : 
-                 'Needs improvement. Make your instructions more specific.'}
+                {qualityScore >= 80 ? 'Excellent! This prompt will likely produce great results.' :
+                  qualityScore >= 60 ? 'Good. Try adding more context for better results.' :
+                    'Needs improvement. Make your instructions more specific.'}
               </p>
             </div>
           )}
@@ -149,13 +163,13 @@ const PromptBuilder = () => {
         {/* Suggestions Panel */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">AI Suggestions</h2>
-          
+
           {isLoading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
             </div>
           ) : suggestions.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto max-h-80">
               {suggestions.map((suggestion, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                   <p className="text-gray-800 mb-3">{suggestion}</p>
@@ -176,10 +190,16 @@ const PromptBuilder = () => {
               <p className="text-sm mt-2">Suggestions will appear here</p>
             </div>
           )}
-          
+
           {latency && !isLoading && (
             <div className="mt-4 text-sm text-gray-500 text-center">
               Generated in {latency}ms
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg">
+              <strong>Error:</strong> {error}
             </div>
           )}
         </div>

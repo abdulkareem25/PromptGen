@@ -5,28 +5,36 @@ const { getTextSuggestion, scorePromptQuality, generateTemplateSchema } = requir
 
 // POST /api/ai/suggest
 router.post('/suggest', async (req, res) => {
-  const { prompt, persona = 'creativeWriter', maxNewTokens } = req.body;
-  if (!prompt) return res.status(400).json({ error: 'prompt is required' });
-
   try {
-    const { text, latency } = await getTextSuggestion(prompt, persona, maxNewTokens);
-    res.json({ text, latency });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    const { prompt, persona, maxNewTokens } = req.body;
+    const { suggestions, latency } = await getTextSuggestion(
+      prompt, 
+      persona || 'aiEnthusiast', 
+      maxNewTokens || 512
+    );
+    
+    res.json({ suggestions, latency });
+  } catch (error) {
+    console.error('Suggest route error:', error);
+    res.status(500).json({ 
+      error: error.message || 'AI suggestion failed',
+      suggestions: []
+    });
   }
 });
 
-// Prompt quality scoring
+// POST /api/ai/score
 router.post('/score', async (req, res) => {
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: 'prompt is required' });
-
   try {
-    const qualityReport = await scorePromptQuality(prompt);
-    res.json(qualityReport);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const { prompt } = req.body;
+    const result = await scorePromptQuality(prompt);
+    res.json(result);
+  } catch (error) {
+    console.error('Score route error:', error);
+    res.status(500).json({ 
+      error: error.message || 'Prompt scoring failed',
+      score: 0
+    });
   }
 });
 
