@@ -1,6 +1,6 @@
 // backend/src/utils/hfService.js
 
-const { InferenceClient } = require("@huggingface/inference");
+import { InferenceClient } from "@huggingface/inference";
 const client = new InferenceClient(process.env.HF_API_KEY);
 
 // /**
@@ -209,6 +209,8 @@ async function generateTemplateSchema(userDescription) {
   }
 }
 
-module.exports = {
-  getTextSuggestion, generateTemplateSchema, scorePromptQuality
+export {
+  getTextSuggestion,
+  generateTemplateSchema,
+  scorePromptQuality
 };

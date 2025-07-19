@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Template = require('../models/template.model');
+import Template from '../models/template.model.js';
 
 // GET all templates
 router.get('/', async (req, res) => {
@@ -34,4 +34,4 @@ router.delete('/:id', async (req, res) => {
   res.json({ msg: 'Deleted' });
 });
 
-module.exports = router;
+export default router;

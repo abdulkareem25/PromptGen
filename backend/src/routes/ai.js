@@ -1,7 +1,7 @@
 // backend/src/routes/ai.js
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { getTextSuggestion, scorePromptQuality, generateTemplateSchema } = require('../utils/hfService');
+import { getTextSuggestion, scorePromptQuality, generateTemplateSchema } from '../utils/hfService.js';
 
 // POST /api/ai/suggest
 router.post('/suggest', async (req, res) => {
@@ -51,4 +51,4 @@ router.post('/generate-template', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

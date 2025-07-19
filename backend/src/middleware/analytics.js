@@ -1,6 +1,6 @@
-const Prompt = require('../models/prompt.model');
+import Prompt from '../models/prompt.model.js';
 
-async function trackPromptAnalytics(req, res, next) {
+export async function trackPromptAnalytics(req, res, next) {
   const start = Date.now();
   
   // Capture response data
@@ -37,5 +37,3 @@ async function trackPromptAnalytics(req, res, next) {
   
   next();
 }
-
-module.exports = trackPromptAnalytics;

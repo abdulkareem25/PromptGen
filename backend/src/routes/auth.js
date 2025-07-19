@@ -1,11 +1,9 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
 
 const router = express.Router();
-
-// Replace with your actual User model
-const User = require('../models/user.model');
 
 // Secret key for JWT (store securely in env variables in production)
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
@@ -64,12 +62,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-module.exports = router;
-
-// --- Test Protected Route ---
-const authenticateToken = require('../middleware/auth');
 
 // GET /test-protected
 router.get('/test-protected', authenticateToken, (req, res) => {
   res.json({ message: `Hello, ${req.user.name || req.user.email}! You have accessed a protected route.` });
 });
+// --- Test Protected Route ---
+import { authenticateToken } from '../middleware/auth.js';
+
+export default router;

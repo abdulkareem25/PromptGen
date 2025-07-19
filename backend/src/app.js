@@ -1,8 +1,8 @@
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config();
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
+import express from 'express';
+import cors from 'cors';
+import { connectDB } from './config/db.js';
 // Connect to the database
 connectDB();
 const app = express();
@@ -18,12 +18,12 @@ app.get('/api', (req, res) => {
 });
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const templateRoutes = require('./routes/templates');
-const aiRoutes = require('./routes/ai');
+import authRoutes from './routes/auth.js';
+import templateRoutes from './routes/templates.js';
+import aiRoutes from './routes/ai.js';
 
 // Import middleware
-const trackPromptAnalytics = require('./middleware/analytics');
+import { trackPromptAnalytics } from './middleware/analytics.js';
 
 // Use analytics middleware for AI routes
 app.use('/api/ai', trackPromptAnalytics);
@@ -41,4 +41,4 @@ app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-module.exports = app;
+export default app;
